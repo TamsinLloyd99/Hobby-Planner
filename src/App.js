@@ -8,23 +8,40 @@ function Button({ children, onClick, type }) {
 
 export default function App() {
   const [isStarted, setIsStarted] = useState(false)
-  const [projectName, setProjectName] = useState("")
-  const [hobby, setHobby] = useState("")
   const [step, setStep] = useState(1)
-  const [yarnName, setYarnName] = useState("")
-  const [needleType, setNeedleType] = useState("")
-  const [knittingPattern, setKnittingPattern] = useState("")
-  const [hookType, setHookType] = useState("")
-  const [crochetPattern, setCrochetPattern] = useState("")
-  const [fabricType, setFabricType] = useState("")
-  const [sewingPattern, setSewingPattern] = useState("")
-  const [extraMaterials, setExtraMaterials] = useState("")
-  const [methodOfMaking, setMethodOfMaking] = useState("")
-  const [toolsNeeded, setToolsNeeded] = useState("")
-  const [colourScheme, setColourScheme] = useState("")
-  const [methodOfColouring, setMethodOfColouring] = useState("")
-  const [ingredients, setIngredients] = useState("")
-  const [recipeNameAndProvider, setRecipeNameAndProvider] = useState("")
+  const [currentProject, setCurrentProject] = useState(null)
+  const [formData, setFormData] = useState({
+    projectName: "",
+    hobby: "",
+    knitting: {
+      yarnName: "",
+      needleType: "",
+      knittingPattern: ""
+    },
+    crochet: {
+      yarnName: "",
+      hookType: "",
+      crochetPattern: ""
+    },
+    sewing: {
+      fabricType: "",
+      sewingPattern: "",
+      extraMaterials: ""
+    },
+    pottery: {
+      methodOfMaking: "",
+      toolsNeeded: "",
+      colourScheme: "",
+      methodOfColouring: ""
+    },
+    baking: {
+      ingredients: "",
+      recipeNameAndProvider: "",
+      extraMaterials: ""
+    }
+  })
+
+  const [submittedProjects, setSubmittedProjects] = useState([]); // or useState([])
 
   function handleStart(e) {
     e.preventDefault()
@@ -38,6 +55,23 @@ export default function App() {
 
   }
 
+  function handleFinish(e) {
+    e.preventDefault()
+    setCurrentProject(formData)
+    setSubmittedProjects([...submittedProjects, formData])
+    setIsStarted(false);
+    setStep(1);
+    setFormData({
+      projectName: "",
+      hobby: "",
+      knitting: { yarnName: "", needleType: "", knittingPattern: "" },
+      crochet: { yarnName: "", hookType: "", crochetPattern: "" },
+      sewing: { fabricType: "", sewingPattern: "", extraMaterials: "" },
+      pottery: { methodOfMaking: "", toolsNeeded: "", colourScheme: "", methodOfColouring: "" },
+      baking: { ingredients: "", recipeNameAndProvider: "", extraMaterials: "" }
+    });
+  }
+
   return (
     <div className="app">
       <Logo />
@@ -48,49 +82,18 @@ export default function App() {
           <>
             {step === 1 && (
               <FirstForm
-                projectName={projectName}
-                setProjectName={setProjectName}
-                hobby={hobby}
-                setHobby={setHobby}
+                formData={formData}
+                setFormData={setFormData}
                 onNext={handleNext} />
             )}
             {step === 2 && (
               <SecondForm
-                projectName={projectName}
-                setProjectName={setProjectName}
-                hobby={hobby}
-                setHobby={setHobby}
-                yarnName={yarnName}
-                setYarnName={setYarnName}
-                needleType={needleType}
-                setNeedleType={setNeedleType}
-                knittingPattern={knittingPattern}
-                setKnittingPattern={setKnittingPattern}
-                hookType={hookType}
-                setHookType={setHookType}
-                crochetPattern={crochetPattern}
-                setCrochetPattern={setCrochetPattern}
-                fabricType={fabricType}
-                setFabricType={setFabricType}
-                sewingPattern={sewingPattern}
-                setSewingPattern={setSewingPattern}
-                extraMaterials={extraMaterials}
-                setExtraMaterials={setExtraMaterials}
-                methodOfMaking={methodOfMaking}
-                setMethodOfMaking={setMethodOfMaking}
-                toolsNeeded={toolsNeeded}
-                setToolsNeeded={setToolsNeeded}
-                colourScheme={colourScheme}
-                setColourScheme={setColourScheme}
-                methodOfColouring={methodOfColouring}
-                setMethodOfColouring={setMethodOfColouring}
-                ingredients={ingredients}
-                setIngredients={setIngredients}
-                recipeNameAndProvider={recipeNameAndProvider}
-                setRecipeNameAndProvider={setRecipeNameAndProvider}
+                formData={formData}
+                setFormData={setFormData}
+                onFinish={handleFinish}
               />
             )}
-            <ProjectCard />
+            <ProjectCard project={currentProject} />
           </>
         )}
       </main>
@@ -106,15 +109,13 @@ function Logo() {
 }
 
 
-function FirstForm({ projectName, setProjectName, hobby, setHobby, onNext }) {
+function FirstForm({ formData, setFormData, onNext }) {
 
   function handleSubmit(e) {
-    if (!projectName || !hobby) return;
     e.preventDefault()
+    if (!formData.projectName || !formData.hobby) return;
 
-    const newHobby = { id: Date.now(), projectName, hobby };
-    console.log(newHobby)
-    onNext()
+    onNext(e)
   }
 
 
@@ -125,13 +126,13 @@ function FirstForm({ projectName, setProjectName, hobby, setHobby, onNext }) {
       <input
         type="text"
         placeholder="Type name here"
-        value={projectName}
-        onChange={(e) => setProjectName(e.target.value)} />
+        value={formData.projectName}
+        onChange={(e) => setFormData(prev => ({ ...prev, projectName: e.target.value }))} />
 
 
       <h3>Select a Hobby</h3>
-      <select value={hobby}
-        onChange={(e) => setHobby(e.target.value)}>
+      <select value={formData.hobby}
+        onChange={(e) => setFormData(prev => ({ ...prev, hobby: e.target.value }))}>
         <option value="">--Select--</option>
         <option value="Knitting">Knitting</option>
         <option value="Crochet">Crochet</option>
@@ -144,116 +145,201 @@ function FirstForm({ projectName, setProjectName, hobby, setHobby, onNext }) {
   )
 }
 
-function SecondForm({
-  projectName,
-  setProjectName,
-  hobby, setHobby,
-  yarnName, setYarnName,
-  needleType, setNeedleType,
-  knittingPattern,
-  setKnittingPattern,
-  hookType,
-  setHookType,
-  crochetPattern,
-  setCrochetPattern,
-  fabricType,
-  setFabricType,
-  sewingPattern,
-  setSewingPattern,
-  extraMaterials,
-  setExtraMaterials,
-  methodOfMaking,
-  setMethodOfMaking,
-  toolsNeeded,
-  setToolsNeeded,
-  colourScheme,
-  setColourScheme,
-  methodOfColouring,
-  setMethodOfColouring,
-  ingredients,
-  setIngredients,
-  recipeNameAndProvider,
-  setRecipeNameAndProvider }) {
+function SecondForm({ formData, setFormData, onFinish }) {
+
+  const { hobby } = formData;
 
   if (!hobby) return null;
 
-  switch (hobby) {
-    case "Knitting":
-      return (
-        <>
-          <label >Yarn name</label>
-          <input type="text" placeholder="Type yarn name here" value={yarnName} onChange={(e) => setYarnName(e.target.value)} />
-          <label>Needle type(s)</label>
-          <input type="text" placeholder="Type needle type here" value={needleType} onChange={(e) => setNeedleType(e.target.value)} />
-          <label>Knitting Pattern</label>
-          <input type="text" placeholder="Type knitting pattern here" value={knittingPattern} onChange={(e) => setKnittingPattern(e.target.value)} />
-        </>
-      );
+  const handleNestedChange = (section, field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      [section]: {
+        ...prev[section],
+        [field]: value
+      }
+    }))
+  };
 
-    case "Crochet":
-      return (
-        <>
-          <label >Yarn name</label>
-          <input type="text" placeholder="Type yarn name here" value={yarnName} onChange={(e) => setYarnName(e.target.value)} />
-          <label>Hook type(s)</label>
-          <input type="text" placeholder="Type needle type here" value={hookType} onChange={(e) => setHookType(e.target.value)} />
-          <label>Crochet Pattern</label>
-          <input type="text" placeholder="Type crochet pattern here" value={crochetPattern} onChange={(e) => setCrochetPattern(e.target.value)} />
-        </>
-      )
+  const renderFields = () => {
+    switch (hobby) {
+      case "Knitting":
+        return (
+          <>
+            <label htmlFor="YarnName">Yarn name</label>
+            <input id="YarnName"
+              type="text"
+              placeholder="Type yarn name here"
+              value={formData.knitting.yarnName}
+              onChange={(e) => handleNestedChange("knitting", "yarnName", e.target.value)} />
+            <label htmlFor="NeedleType">Needle type(s)</label>
+            <input id="NeedleType" type="text"
+              placeholder="Type needle type here"
+              value={formData.knitting.needleType}
+              onChange={(e) => handleNestedChange("knitting", "needleType", e.target.value)} />
+            <label htmlFor="KnittingPattern">Knitting Pattern</label>
+            <input id="KnittingPattern" type="text"
+              placeholder="Type knitting pattern here"
+              value={formData.knitting.knittingPattern}
+              onChange={(e) => handleNestedChange("knitting", "knittingPattern", e.target.value)} />
+          </>
+        );
 
-    case "Sewing":
-      return (
-        <>
-          <label>Fabric type</label>
-          <input type="text" placeholder="Type fabric type here" value={fabricType} onChange={(e) => setFabricType(e.target.value)} />
-          <label>Sewing Pattern</label>
-          <input type="text" placeholder="Type sewing pattern here" value={sewingPattern} onChange={(e) => setSewingPattern(e.target.value)} />
-          <label>Extra materials</label>
-          <input type="text" placeholder="Type extra materials here" value={extraMaterials} onChange={(e) => setExtraMaterials(e.target.value)} />
-        </>
-      )
+      case "Crochet":
+        return (
+          <>
+            <label htmlFor="YarnName" >Yarn name</label>
+            <input id="YarnName" type="text"
+              placeholder="Type yarn name here"
+              value={formData.crochet.yarnName}
+              onChange={(e) => handleNestedChange("crochet", "yarnName", e.target.value)} />
+            <label htmlFor="HookType">Hook type(s)</label>
+            <input id="HookType" type="text"
+              placeholder="Type needle type here"
+              value={formData.crochet.hookType}
+              onChange={(e) => handleNestedChange("crochet", "hookType", e.target.value)} />
+            <label htmlFor="CrochetPattern">Crochet Pattern</label>
+            <input id="CrochetPattern" type="text"
+              placeholder="Type crochet pattern here"
+              value={formData.crochet.crochetPattern}
+              onChange={(e) => handleNestedChange("crochet", "crochetPattern", e.target.value)} />
+          </>
+        )
 
-    case "Pottery":
-      return (
-        <>
-          <label>Method of making</label>
-          <select value={methodOfMaking} onChange={(e) => setMethodOfMaking(e.target.value)}>
-            <option value="">--Select--</option>
-            <option value="On the wheel">On the wheel</option>
-            <option value="Slabbing">Slabbing</option>
-            <option value="Sculpture">Sculpture</option>
-            <option value="Freehand">Freehand</option>
-          </select>
-          <label>Tools needed</label>
-          <input type="text" placeholder="Type tools needed here" value={toolsNeeded} onChange={(e) => setToolsNeeded(e.target.value)} />
-          <label>Colour scheme</label>
-          <input type="text" placeholder="Type colour scheme here" value={colourScheme} onChange={(e) => setColourScheme(e.target.value)} />
-          <label>Method of colouring</label>
-          <input type="text" placeholder="Type method of colouring here" value={methodOfColouring} onChange={(e) => setMethodOfColouring(e.target.value)} />
-        </>
-      )
+      case "Sewing":
+        return (
+          <>
+            <label htmlFor="FabricType">Fabric type</label>
+            <input id="FabricType" type="text"
+              placeholder="Type fabric type here"
+              value={formData.sewing.fabricType}
+              onChange={(e) => handleNestedChange("sewing", "fabricType", e.target.value)} />
+            <label htmlFor="SewingPattern">Sewing Pattern</label>
+            <input id="SewingPattern" type="text"
+              placeholder="Type sewing pattern here"
+              value={formData.sewing.sewingPattern}
+              onChange={(e) => handleNestedChange("sewing", "sewingPattern", e.target.value)} />
+            <label htmlFor="ExtraMaterials">Extra materials</label>
+            <input id="ExtraMaterials" type="text"
+              placeholder="Type extra materials here"
+              value={formData.sewing.extraMaterials}
+              onChange={(e) => handleNestedChange("sewing", "extraMaterials", e.target.value)} />
+          </>
+        )
 
-    case "Baking":
-      return (
-        <>
-          <label>Ingredients</label>
-          <input type="text" placeholder="Type ingredients here" value={ingredients} onChange={(e) => setIngredients(e.target.value)} />
-          <label>Recipe name and provider</label>
-          <input type="text" placeholder="Type recipe name and provider here" value={recipeNameAndProvider} onChange={(e) => setRecipeNameAndProvider(e.target.value)} />
-          <label>Extra materials</label>
-          <input type="text" placeholder="Type extra materials here" value={extraMaterials} onChange={(e) => setExtraMaterials(e.target.value)} />
-        </>
-      )
-    default:
-      return null;
-  }
+      case "Pottery":
+        return (
+          <>
+            <label htmlFor="MethodOfMaking">Method of making</label>
+            <select id="MethodOfMaking" value={formData.pottery.methodOfMaking}
+              onChange={(e) => handleNestedChange("pottery", "methodOfMaking", e.target.value)}>
+              <option value="">--Select--</option>
+              <option value="On the wheel">On the wheel</option>
+              <option value="Slabbing">Slabbing</option>
+              <option value="Sculpture">Sculpture</option>
+              <option value="Freehand">Freehand</option>
+            </select>
+            <label htmlFor="ToolsNeeded">Tools needed</label>
+            <input id="ToolsNeeded" type="text"
+              placeholder="Type tools needed here"
+              value={formData.pottery.toolsNeeded}
+              onChange={(e) => handleNestedChange("pottery", "toolsNeeded", e.target.value)} />
+            <label htmlFor="ColourScheme"> Colour Scheme</label>
+            <input id="ColourScheme" type="text"
+              placeholder="Type colour scheme here"
+              value={formData.pottery.colourScheme}
+              onChange={(e) => handleNestedChange("pottery", "colourScheme", e.target.value)} />
+            <label htmlFor="MethodOfColouring">Method of colouring</label>
+            <input id="MethodOfColouring" type="text"
+              placeholder="Type method of colouring here"
+              value={formData.pottery.methodOfColouring}
+              onChange={(e) => handleNestedChange("pottery", "methodOfColouring", e.target.value)} />
+          </>
+        )
 
+      case "Baking":
+        return (
+          <>
+            <label htmlFor="Ingredients">Ingredients</label>
+            <input id="Ingredients" type="text"
+              placeholder="Type ingredients here"
+              value={formData.baking.ingredients}
+              onChange={(e) => handleNestedChange("baking", "ingredients", e.target.value)} />
+            <label htmlFor="RecipeNameAndProvider">Recipe name and provider</label>
+            <input id="RecipeNameAndProvider" type="text"
+              placeholder="Type recipe name and provider here"
+              value={formData.baking.recipeNameAndProvider}
+              onChange={(e) => handleNestedChange("baking", "recipeNameAndProvider", e.target.value)} />
+            <label htmlFor="ExtraMaterials">Extra materials</label>
+            <input id="ExtraMaterials" type="text"
+              placeholder="Type extra materials here"
+              value={formData.baking.extraMaterials}
+              onChange={(e) => handleNestedChange("baking", "extraMaterials", e.target.value)} />
+          </>
+        )
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <form onSubmit={onFinish}>
+      {renderFields()}
+      <Button type="submit">
+        Finish
+      </Button>
+    </form>
+  )
 }
 
 
-function ProjectCard() {
-  return
+function ProjectCard({ project }) {
+  if (!project) return null;
+
+  return (
+    <div className="project-card">
+      <h2>{project.projectName}</h2>
+      <p>Hobby: {project.hobby}</p>
+
+      {project.hobby === "Knitting" && (
+        <>
+          <p>Yarn: {project.knitting.yarnName}</p>
+          <p>Needle Type: {project.knitting.needleType}</p>
+          <p>Pattern: {project.knitting.knittingPattern}</p>
+        </>
+      )}
+      {project.hobby === "Crochet" && (
+        <>
+          <p>Yarn: {project.crochet.yarnName}</p>
+          <p>Hook Type: {project.crochet.hookType}</p>
+          <p>Pattern: {project.crochet.crochetPattern}</p>
+        </>
+      )}
+      {project.hobby === "Sewing" && (
+        <>
+          <p>Fabric: {project.sewing.fabricType}</p>
+          <p>Sewing Pattern: {project.sewing.sewingPattern}</p>
+          <p>Extra Materials: {project.sewing.extraMaterials}</p>
+        </>
+      )}
+      {project.hobby === "Pottery" && (
+        <>
+          <p>Method of Making: {project.pottery.methodOfMaking}</p>
+          <p>Tools Needed: {project.pottery.toolsNeeded}</p>
+          <p>Colour Scheme: {project.pottery.colourScheme}</p>
+          <p>Method of Colouring: {project.pottery.methodOfColouring}</p>
+        </>
+      )}
+      {project.hobby === "Baking" && (
+        <>
+          <p>Ingredients: {project.baking.ingredients}</p>
+          <p>Recipe provider: {project.baking.recipeNameAndProvider}</p>
+          <p>Extra Materials: {project.baking.extraMaterials}</p>
+        </>
+      )}
+
+    </div>
+  )
 }
 
 function Footer() {
