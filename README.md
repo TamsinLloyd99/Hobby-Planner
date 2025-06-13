@@ -59,6 +59,8 @@ hobby-planner/
 - Layout managed with Flexbox
 - Google Fonts for handwritten, friendly UI tone
 
+[Deployed site](https://react-hobby-planner.netlify.app/)
+
 ## 🧑‍💻 Author
 
 Created by **Tamsin Lloyd** – a hobby enthusiast and aspiring front-end developer.  
