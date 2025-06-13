@@ -59,7 +59,7 @@ hobby-planner/
 - Layout managed with Flexbox
 - Google Fonts for handwritten, friendly UI tone
 
-[Deployed site](https://react-hobby-planner.netlify.app/)
+[Deployed Link](https://react-hobby-planner.netlify.app/)
 
 ## 🧑‍💻 Author
 
