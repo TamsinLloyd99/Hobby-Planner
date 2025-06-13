@@ -49,6 +49,7 @@ body {
 .btn {
   border-radius: 10px;
   padding: 10px 20px;
+  margin-top: 10px;
   background-color: var(--main-font-color);
   color: var(--main-bg-color);
   border: solid 2px var(--accent-font-color);
@@ -75,6 +76,24 @@ select {
   border: 2px solid var(--accent-font-color);
   border-radius: 5px;
   font-family: inherit;
+}
+
+.project-card {
+  color: var(--main-font-color);
+  background-color: var(--main-bg-color);
+  width: 210mm;
+  text-align: center;
+  padding: 20mm;
+  border-radius: 10px;
+  border: solid 2px var(--accent-font-color);
+}
+
+.project-card h2 {
+  color: var(--accent-font-color);
+}
+
+.project-card p {
+  margin: 5px 0;
 }
 
 .footer {

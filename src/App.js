@@ -18,28 +18,33 @@ export default function App() {
     knitting: {
       yarnName: "",
       needleType: "",
-      knittingPattern: ""
+      knittingPattern: "",
+      inspirationImages: []
     },
     crochet: {
       yarnName: "",
       hookType: "",
-      crochetPattern: ""
+      crochetPattern: "",
+      inspirationImages: []
     },
     sewing: {
       fabricType: "",
       sewingPattern: "",
-      extraMaterials: ""
+      extraMaterials: "",
+      inspirationImages: []
     },
     pottery: {
       methodOfMaking: "",
       toolsNeeded: "",
       colourScheme: "",
-      methodOfColouring: ""
+      methodOfColouring: "",
+      inspirationImages: []
     },
     baking: {
       ingredients: "",
       recipeNameAndProvider: "",
-      extraMaterials: ""
+      extraMaterials: "",
+      inspirationImages: []
     }
   })
 
@@ -54,11 +59,11 @@ export default function App() {
     setFormData({
       projectName: "",
       hobby: "",
-      knitting: { yarnName: "", needleType: "", knittingPattern: "" },
-      crochet: { yarnName: "", hookType: "", crochetPattern: "" },
-      sewing: { fabricType: "", sewingPattern: "", extraMaterials: "" },
-      pottery: { methodOfMaking: "", toolsNeeded: "", colourScheme: "", methodOfColouring: "" },
-      baking: { ingredients: "", recipeNameAndProvider: "", extraMaterials: "" }
+      knitting: { yarnName: "", needleType: "", knittingPattern: "", inspirationImages: [] },
+      crochet: { yarnName: "", hookType: "", crochetPattern: "", inspirationImages: [] },
+      sewing: { fabricType: "", sewingPattern: "", extraMaterials: "", inspirationImages: [] },
+      pottery: { methodOfMaking: "", toolsNeeded: "", colourScheme: "", methodOfColouring: "", inspirationImages: [] },
+      baking: { ingredients: "", recipeNameAndProvider: "", extraMaterials: "", inspirationImages: [] }
     })
   }
 
@@ -77,7 +82,16 @@ export default function App() {
 
   function handleDownload() {
     if (!cardRef.current) return;
-    html2pdf().from(cardRef.current).save(`${formData.projectName}.pdf`);
+
+    const opt = {
+      margin: 0.5,
+      filename: `${formData.projectName}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+
+    html2pdf().set(opt).from(cardRef.current).save();
   }
 
   return (
@@ -107,7 +121,6 @@ export default function App() {
                 <div ref={cardRef}>
                   <ProjectCard project={currentProject} />
                 </div>
-                <p>Your project has been created</p>
                 <Button onClick={handleDownload}>Download as PDF</Button>
                 <Button onClick={handleStart}>Start a New Project</Button>
               </>
@@ -167,6 +180,7 @@ function FirstForm({ formData, setFormData, onNext }) {
 function SecondForm({ formData, setFormData, onFinish }) {
 
   const { hobby } = formData;
+  const [newImageUrl, setNewImageUrl] = useState("");
 
   if (!hobby) return null;
 
@@ -179,6 +193,22 @@ function SecondForm({ formData, setFormData, onFinish }) {
       }
     }))
   };
+
+  const addImageUrl = () => {
+    if (newImageUrl.trim() === "") return;
+    setFormData(prev => ({
+      ...prev,
+      inspirationImages: [...(prev.inspirationImages || []), newImageUrl.trim()]
+    }));
+  }
+
+  const removeImageUrl = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      inspirationImages: prev.inspirationImages.filter((_, i) => i !== index)
+    }));
+  };
+
 
   const renderFields = () => {
     switch (hobby) {
@@ -304,6 +334,35 @@ function SecondForm({ formData, setFormData, onFinish }) {
   return (
     <form onSubmit={onFinish}>
       {renderFields()}
+      <div style={{ marginTop: "20px" }}>
+        <label>Add inspiration images (URLs):</label>
+        <input
+          type="text"
+          placeholder="Paste image URL here"
+          value={newImageUrl}
+          onChange={(e) => setNewImageUrl(e.target.value)}
+        />
+        <Button type="button" onClick={addImageUrl} style={{ marginLeft: "8px" }}>
+          Add Image
+        </Button>
+
+        <div style={{ marginTop: "10px" }}>
+          {formData.inspirationImages && formData.inspirationImages.length > 0 && (
+            formData.inspirationImages.map((url, idx) => (
+              <div key={idx} style={{ display: "flex", alignItems: "center", marginBottom: "5px" }}>
+                <img
+                  src={url}
+                  alt={`Inspiration ${idx + 1}`}
+                  style={{ width: "50px", height: "50px", objectFit: "cover", marginRight: "10px" }}
+                  onError={(e) => (e.target.style.display = "none")}
+                />
+                <button type="button" onClick={() => removeImageUrl(idx)}>Remove</button>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+
       <Button type="submit">
         Finish
       </Button>
@@ -316,7 +375,7 @@ function ProjectCard({ project }) {
   if (!project) return null;
 
   return (
-    <div className="project-card">
+    <div id={project.projectName} className="project-card">
       <h2>{project.projectName}</h2>
       <p>Hobby: {project.hobby}</p>
 
@@ -355,6 +414,23 @@ function ProjectCard({ project }) {
           <p>Recipe provider: {project.baking.recipeNameAndProvider}</p>
           <p>Extra Materials: {project.baking.extraMaterials}</p>
         </>
+      )}
+
+      {project.inspirationImages && project.inspirationImages.length > 0 && (
+        <div className="inspiration-images" style={{ marginTop: "1em" }}>
+          <h3>Inspiration Images:</h3>
+          <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", justifyContent: "center", marginTop: "10px" }}>
+            {project.inspirationImages.map((url, index) => (
+              <img
+                key={index}
+                src={url}
+                alt={`Inspiration ${index + 1}`}
+                style={{ width: "100px", height: "100px", objectFit: "cover", borderRadius: "4px" }}
+                onError={(e) => (e.target.style.display = "none")} // hides broken images
+              />
+            ))}
+          </div>
+        </div>
       )}
 
     </div>
