@@ -332,7 +332,7 @@ function SecondForm({ formData, setFormData, onFinish }) {
   };
 
   return (
-    <form onSubmit={onFinish}>
+    <form className="form" onSubmit={onFinish}>
       {renderFields()}
       <div style={{ marginTop: "20px" }}>
         <label>Add inspiration images (URLs):</label>
@@ -375,64 +375,66 @@ function ProjectCard({ project }) {
   if (!project) return null;
 
   return (
-    <div id={project.projectName} className="project-card">
-      <h2>{project.projectName}</h2>
-      <p>Hobby: {project.hobby}</p>
+    <div className="pdf-wrapper">
+      <div id={project.projectName} className="project-card">
+        <h2>{project.projectName}</h2>
+        <p>Hobby: {project.hobby}</p>
 
-      {project.hobby === "Knitting" && (
-        <>
-          <p>Yarn: {project.knitting.yarnName}</p>
-          <p>Needle Type: {project.knitting.needleType}</p>
-          <p>Pattern: {project.knitting.knittingPattern}</p>
-        </>
-      )}
-      {project.hobby === "Crochet" && (
-        <>
-          <p>Yarn: {project.crochet.yarnName}</p>
-          <p>Hook Type: {project.crochet.hookType}</p>
-          <p>Pattern: {project.crochet.crochetPattern}</p>
-        </>
-      )}
-      {project.hobby === "Sewing" && (
-        <>
-          <p>Fabric: {project.sewing.fabricType}</p>
-          <p>Sewing Pattern: {project.sewing.sewingPattern}</p>
-          <p>Extra Materials: {project.sewing.extraMaterials}</p>
-        </>
-      )}
-      {project.hobby === "Pottery" && (
-        <>
-          <p>Method of Making: {project.pottery.methodOfMaking}</p>
-          <p>Tools Needed: {project.pottery.toolsNeeded}</p>
-          <p>Colour Scheme: {project.pottery.colourScheme}</p>
-          <p>Method of Colouring: {project.pottery.methodOfColouring}</p>
-        </>
-      )}
-      {project.hobby === "Baking" && (
-        <>
-          <p>Ingredients: {project.baking.ingredients}</p>
-          <p>Recipe provider: {project.baking.recipeNameAndProvider}</p>
-          <p>Extra Materials: {project.baking.extraMaterials}</p>
-        </>
-      )}
+        {project.hobby === "Knitting" && (
+          <>
+            <p>Yarn: {project.knitting.yarnName}</p>
+            <p>Needle Type: {project.knitting.needleType}</p>
+            <p>Pattern: {project.knitting.knittingPattern}</p>
+          </>
+        )}
+        {project.hobby === "Crochet" && (
+          <>
+            <p>Yarn: {project.crochet.yarnName}</p>
+            <p>Hook Type: {project.crochet.hookType}</p>
+            <p>Pattern: {project.crochet.crochetPattern}</p>
+          </>
+        )}
+        {project.hobby === "Sewing" && (
+          <>
+            <p>Fabric: {project.sewing.fabricType}</p>
+            <p>Sewing Pattern: {project.sewing.sewingPattern}</p>
+            <p>Extra Materials: {project.sewing.extraMaterials}</p>
+          </>
+        )}
+        {project.hobby === "Pottery" && (
+          <>
+            <p>Method of Making: {project.pottery.methodOfMaking}</p>
+            <p>Tools Needed: {project.pottery.toolsNeeded}</p>
+            <p>Colour Scheme: {project.pottery.colourScheme}</p>
+            <p>Method of Colouring: {project.pottery.methodOfColouring}</p>
+          </>
+        )}
+        {project.hobby === "Baking" && (
+          <>
+            <p>Ingredients: {project.baking.ingredients}</p>
+            <p>Recipe provider: {project.baking.recipeNameAndProvider}</p>
+            <p>Extra Materials: {project.baking.extraMaterials}</p>
+          </>
+        )}
 
-      {project.inspirationImages && project.inspirationImages.length > 0 && (
-        <div className="inspiration-images" style={{ marginTop: "1em" }}>
-          <h3>Inspiration Images:</h3>
-          <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", justifyContent: "center", marginTop: "10px" }}>
-            {project.inspirationImages.map((url, index) => (
-              <img
-                key={index}
-                src={url}
-                alt={`Inspiration ${index + 1}`}
-                style={{ width: "100px", height: "100px", objectFit: "cover", borderRadius: "4px" }}
-                onError={(e) => (e.target.style.display = "none")} // hides broken images
-              />
-            ))}
+        {project.inspirationImages && project.inspirationImages.length > 0 && (
+          <div className="inspiration-images" style={{ marginTop: "1em" }}>
+            <h3>Inspiration Images:</h3>
+            <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", justifyContent: "center", marginTop: "10px" }}>
+              {project.inspirationImages.map((url, index) => (
+                <img
+                  key={index}
+                  src={url}
+                  alt={`Inspiration ${index + 1}`}
+                  style={{ width: "100px", height: "100px", objectFit: "cover", borderRadius: "4px" }}
+                  onError={(e) => (e.target.style.display = "none")} // hides broken images
+                />
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
+      </div>
     </div>
   )
 }
