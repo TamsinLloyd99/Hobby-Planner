@@ -1,4 +1,6 @@
 import { useState } from "react"
+import { useRef } from "react"
+import html2pdf from "html2pdf.js"
 
 
 function Button({ children, onClick, type }) {
@@ -42,11 +44,22 @@ export default function App() {
   })
 
   const [submittedProjects, setSubmittedProjects] = useState([]); // or useState([])
+  const cardRef = useRef(null);
 
   function handleStart(e) {
     e.preventDefault()
-
     setIsStarted(true)
+    setStep(1);
+    setCurrentProject(null)
+    setFormData({
+      projectName: "",
+      hobby: "",
+      knitting: { yarnName: "", needleType: "", knittingPattern: "" },
+      crochet: { yarnName: "", hookType: "", crochetPattern: "" },
+      sewing: { fabricType: "", sewingPattern: "", extraMaterials: "" },
+      pottery: { methodOfMaking: "", toolsNeeded: "", colourScheme: "", methodOfColouring: "" },
+      baking: { ingredients: "", recipeNameAndProvider: "", extraMaterials: "" }
+    })
   }
 
   function handleNext(e) {
@@ -59,17 +72,12 @@ export default function App() {
     e.preventDefault()
     setCurrentProject(formData)
     setSubmittedProjects([...submittedProjects, formData])
-    setIsStarted(false);
-    setStep(1);
-    setFormData({
-      projectName: "",
-      hobby: "",
-      knitting: { yarnName: "", needleType: "", knittingPattern: "" },
-      crochet: { yarnName: "", hookType: "", crochetPattern: "" },
-      sewing: { fabricType: "", sewingPattern: "", extraMaterials: "" },
-      pottery: { methodOfMaking: "", toolsNeeded: "", colourScheme: "", methodOfColouring: "" },
-      baking: { ingredients: "", recipeNameAndProvider: "", extraMaterials: "" }
-    });
+    setStep(2);
+  };
+
+  function handleDownload() {
+    if (!cardRef.current) return;
+    html2pdf().from(cardRef.current).save(`${formData.projectName}.pdf`);
   }
 
   return (
@@ -86,14 +94,24 @@ export default function App() {
                 setFormData={setFormData}
                 onNext={handleNext} />
             )}
-            {step === 2 && (
+            {step === 2 && !currentProject && (
               <SecondForm
                 formData={formData}
                 setFormData={setFormData}
                 onFinish={handleFinish}
               />
             )}
-            <ProjectCard project={currentProject} />
+
+            {step === 2 && currentProject && (
+              <>
+                <div ref={cardRef}>
+                  <ProjectCard project={currentProject} />
+                </div>
+                <p>Your project has been created</p>
+                <Button onClick={handleDownload}>Download as PDF</Button>
+                <Button onClick={handleStart}>Start a New Project</Button>
+              </>
+            )}
           </>
         )}
       </main>
@@ -101,6 +119,7 @@ export default function App() {
     </div>
   )
 }
+
 
 function Logo() {
   return (
